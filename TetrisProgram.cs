@@ -114,16 +114,29 @@ namespace Tetris
             blockList = new List<Block>();
             rnd = new Random();
         }
-        protected override void Update(GameTime gameTime) //----------Find a way to get it back to default
+         protected override void Update(GameTime gameTime) //----------Find a way to get it back to default
         {
-                if (Keyboard.GetState().IsKeyDown(Keys.Q))
-                    lBlockInvert.RotatationLeft1();
-                if (Keyboard.GetState().IsKeyDown(Keys.W))
-                    lBlockInvert.RotatationLeft2();
-                if (Keyboard.GetState().IsKeyDown(Keys.E))
-                    lBlockInvert.RotatationRight1();
-                if (Keyboard.GetState().IsKeyDown(Keys.R))
-                    lBlockInvert.RotatationRight2();
+            previousKeyboardState = currentKeyboardState;
+            currentKeyboardState = Keyboard.GetState();   //-----------Allt här ska väl till inputhelper?
+
+            //Exit game
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+            //Rotating block
+            if (Keyboard.GetState().IsKeyDown(Keys.Q))
+                lBlockInvert.RotatationLeft1();
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+                lBlockInvert.RotatationLeft2();
+            if (Keyboard.GetState().IsKeyDown(Keys.E))
+                lBlockInvert.RotatationRight1();
+            if (Keyboard.GetState().IsKeyDown(Keys.R))
+                lBlockInvert.RotatationRight2();
+            //Move block sideways
+            if (Keyboard.GetState().IsKeyDown(Keys.A) && !previousKeyboardState.IsKeyDown(Keys.A))
+                lBlockInvert.MoveLeft();
+            if (Keyboard.GetState().IsKeyDown(Keys.D) && !previousKeyboardState.IsKeyDown(Keys.D))
+                lBlockInvert.MoveRight();
+
             inputHelper.Update(gameTime);           
         }
         protected override void Draw(GameTime gameTime)
