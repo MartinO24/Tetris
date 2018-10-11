@@ -24,14 +24,12 @@ namespace Tetris.Classes
     GameState gameState;
     SpriteFont font;
     TetrisGrid grid;
-    
-
     public GameWorld(ContentManager Content)
     {
         random = new Random();
         gameState = GameState.Playing;
         font = Content.Load<SpriteFont>("SpelFont");
-        //grid = new TetrisGrid();
+        grid = new TetrisGrid(Content);
     }
         public void HandleInput(GameTime gameTime, InputHelper inputHelper)
         {
@@ -42,8 +40,13 @@ namespace Tetris.Classes
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 scorePosition = new Vector2(300, 30);
+            Vector2 scorePosition = new Vector2(330, 0);
+            Vector2 levelPosition = new Vector2(330, 30);
+            Vector2 nextBlockPosition = new Vector2(330, 60);
+
             spriteBatch.DrawString(font, "Score: ", scorePosition, Color.Blue);
+            spriteBatch.DrawString(font, "Level: ", levelPosition, Color.Blue);
+            spriteBatch.DrawString(font, "Next block: ", nextBlockPosition, Color.Blue);
         }
         public void Reset()
         {
