@@ -2,13 +2,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using Tetris.Classes;
 
 namespace Tetris
 {
     class TetrisProgram : Game
     {
-        TetrisGrid tetGrid;
+        GameWorld gameWorld;
+        List<Block> blockList;
+        TetrisGrid tetrisGrid;
         Block block;
         ZBlock zBlock;
         SquBlock squBlock;
@@ -17,9 +20,8 @@ namespace Tetris
         LBlock lBlock;
         LBlockInvert lBlockInvert;
         ZBlockInvert zBlockInvert;
-        //Gjort detta utifrån JewJam2 
-        //Klasser från JewJam3 "gameObject.class" etc. 
-        //Layers ska användas på gridden. 
+        Random rndBlock;
+        Random rnd;
         protected GraphicsDeviceManager graphics;
         protected SpriteBatch spriteBatch;
         protected Matrix spriteScale;
@@ -39,15 +41,12 @@ namespace Tetris
             TetrisProgram game = new TetrisProgram();
             game.Run();
         }
-
         public TetrisProgram()
         {
             graphics = new GraphicsDeviceManager(this);
-            //ContentManager = Content;
             Content.RootDirectory = "Content";
             random = new Random();
             inputHelper = new InputHelper();
-
         }
         public bool FullScreen
         {
@@ -57,8 +56,6 @@ namespace Tetris
                 ApplyResolutionSettings(value);
             }
         }
-
-
         public void ApplyResolutionSettings(bool fullScreen = false)
         {
             if (!fullScreen)
@@ -97,7 +94,6 @@ namespace Tetris
             inputHelper.Offset = new Vector2(viewport.X, viewport.Y);
             spriteScale = Matrix.CreateScale(inputHelper.Scale.X +1f, inputHelper.Scale.Y +1f, 1);
         }
-
         protected override void LoadContent()
         {
             screen = new Point(1440, 1080);
@@ -105,7 +101,8 @@ namespace Tetris
             FullScreen = false;
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            tetGrid = new TetrisGrid(Content);
+            tetrisGrid = new TetrisGrid(Content);
+            gameWorld = new GameWorld(Content);
            // block = new Block(Content);
             zBlock = new ZBlock(Content);
             squBlock = new SquBlock(Content);
@@ -113,19 +110,30 @@ namespace Tetris
             lBlock = new LBlock(Content);
             lBlockInvert = new LBlockInvert(Content);
             zBlockInvert = new ZBlockInvert(Content);
+            iBlock = new IBlock(Content);
+            blockList = new List<Block>();
+            rnd = new Random();
         }
-        protected override void Update(GameTime gameTime)
+        protected override void Update(GameTime gameTime) //----------Find a way to get it back to default
         {
-            inputHelper.Update(gameTime);
+                if (Keyboard.GetState().IsKeyDown(Keys.Q))
+                    lBlockInvert.RotatationLeft1();
+                if (Keyboard.GetState().IsKeyDown(Keys.W))
+                    lBlockInvert.RotatationLeft2();
+                if (Keyboard.GetState().IsKeyDown(Keys.E))
+                    lBlockInvert.RotatationRight1();
+                if (Keyboard.GetState().IsKeyDown(Keys.R))
+                    lBlockInvert.RotatationRight2();
+            inputHelper.Update(gameTime);           
         }
-
         protected override void Draw(GameTime gameTime)
         {
-            //Denhär metoden skriver ut GRIDDEN
             GraphicsDevice.Clear(Color.White);
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
-            tetGrid.Draw(gameTime, spriteBatch);
-            lBlock.Draw(gameTime, spriteBatch);
+            gameWorld.Draw(gameTime, spriteBatch);
+            tetrisGrid.Draw(gameTime, spriteBatch);
+            lBlockInvert.Draw(gameTime, spriteBatch);
+            //block.BlockPicker().Draw(gameTime, spriteBatch);
             spriteBatch.End();
         }
         protected void MoveRowsDown()
@@ -149,8 +157,7 @@ namespace Tetris
             {
                 return screen;
             }
-            set { screen = value; }
-        
+            set { screen = value; }        
         }
 
     }
