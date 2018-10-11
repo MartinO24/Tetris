@@ -26,6 +26,14 @@ namespace Tetris.Classes
             this.layer = layer;
             emptyCell = Content.Load<Texture2D>("block");
         }
+        public void MoveLeft()
+        {
+            position.X--;
+        }
+        public void MoveRight()
+        {
+            position.X++;
+        }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
