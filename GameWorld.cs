@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Tetris.Classes;
 using Microsoft.Xna.Framework.Content;
-using System;
 
 namespace Tetris.Classes
 { 
@@ -20,12 +26,12 @@ namespace Tetris.Classes
     TetrisGrid grid;
     
 
-    public GameWorld()
+    public GameWorld(ContentManager Content)
     {
         random = new Random();
         gameState = GameState.Playing;
-        //font = TetrisProgram.ContentManager.Load<SpriteFont>("SpelFont");
-    //    grid = new TetrisGrid();
+        font = Content.Load<SpriteFont>("SpelFont");
+        //grid = new TetrisGrid();
     }
         public void HandleInput(GameTime gameTime, InputHelper inputHelper)
         {
@@ -36,12 +42,9 @@ namespace Tetris.Classes
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-          /*  spriteBatch.Begin();
-            grid.Draw(gameTime, spriteBatch);
-            spriteBatch.DrawString(font, "Hello!", Vector2.Zero, Color.Blue);
-            spriteBatch.End(); */
+            Vector2 scorePosition = new Vector2(300, 30);
+            spriteBatch.DrawString(font, "Score: ", scorePosition, Color.Blue);
         }
-
         public void Reset()
         {
         }
