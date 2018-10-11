@@ -34,8 +34,8 @@ namespace Tetris.Classes
                 for (int y = 0; y < 4; y++)
                 {
                     if(shape[x,y])
-                    {
-                        Vector2 drawPosition = new Vector2((position.X + x) * 30, (position.Y + y) * 30); //empty.Width 
+                    { // UPPDATERADE
+                        Vector2 drawPosition = new Vector2((position.X + y) * emptyCell.Width, (position.Y + x) * emptyCell.Height);
                         spriteBatch.Draw(emptyCell, drawPosition, color);
                     }
                 }
