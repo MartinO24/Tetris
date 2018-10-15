@@ -9,18 +9,36 @@ namespace Tetris
 {
     class TetrisProgram : Game
     {
+        /* TO DO
+         * Collisions
+         * Score
+         * Control with just arrows
+         * Music
+         * All rotations in all block-classes
+         * Currentblock - för ett block så ett skapas
+         * 
+        */
+
+        public enum GameState
+        {
+            WelcomeScreen,
+            StartScreen,
+            PlayScreen,
+            GameOverScreen
+        }
+        GameState CurrentState = GameState.WelcomeScreen;
+
+        //Ska till inputhelper
+        KeyboardState currentKeyboardState, previousKeyboardState;
+
         GameWorld gameWorld;
-        List<Block> blockList;
         TetrisGrid tetrisGrid;
-        Block block;
-        ZBlock zBlock;
-        SquBlock squBlock;
-        TBlock tBlock;
-        IBlock iBlock;
-        LBlock lBlock;
-        LBlockInvert lBlockInvert;
-        ZBlockInvert zBlockInvert;
-        Random rndBlock;
+       // Block block;
+        public Block activeBlock;
+
+        public bool gameRun { get; set; }
+        public bool keyP;
+
         Random rnd;
         protected GraphicsDeviceManager graphics;
         protected SpriteBatch spriteBatch;
@@ -28,7 +46,6 @@ namespace Tetris
         protected static Point screen;
         protected Point windowSize;
         protected static Random random;
-        protected Texture2D emptyCell;
         protected int[,] grid;
         protected InputHelper inputHelper;
 
@@ -92,30 +109,41 @@ namespace Tetris
             inputHelper.Scale = new Vector2((float)GraphicsDevice.Viewport.Width / screen.X,
                                             (float)GraphicsDevice.Viewport.Height / screen.Y);
             inputHelper.Offset = new Vector2(viewport.X, viewport.Y);
-            spriteScale = Matrix.CreateScale(inputHelper.Scale.X +1f, inputHelper.Scale.Y +1f, 1);
+            spriteScale = Matrix.CreateScale(inputHelper.Scale.X +2/3f, inputHelper.Scale.Y +2/3f, 1);
         }
         protected override void LoadContent()
         {
-            screen = new Point(1440, 1080);
-            windowSize = new Point(1024, 768);
+            screen = new Point(1340, 1180);
+            windowSize = new Point(924, 868);
             FullScreen = false;
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             tetrisGrid = new TetrisGrid(Content);
             gameWorld = new GameWorld(Content);
-           // block = new Block(Content);
-            zBlock = new ZBlock(Content);
-            squBlock = new SquBlock(Content);
-            tBlock = new TBlock(Content);
-            lBlock = new LBlock(Content);
-            lBlockInvert = new LBlockInvert(Content);
-            zBlockInvert = new ZBlockInvert(Content);
-            iBlock = new IBlock(Content);
-            blockList = new List<Block>();
+           // block = new Block(Content, Color.White);
             rnd = new Random();
+            activeBlock = new Block(Content, Color.White);
         }
-         protected override void Update(GameTime gameTime) //----------Find a way to get it back to default
+        protected override void Update(GameTime gameTime) //----------Find a way to get it back to default
         {
+            switch (CurrentState)
+            {
+                case GameState.WelcomeScreen:
+                    if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                        CurrentState = GameState.StartScreen;
+                    activeBlock = activeBlock.SpawnNewBlock(Content);
+                    break;
+            }
+            switch (CurrentState)
+            {
+                case GameState.StartScreen:
+                    if (Keyboard.GetState().IsKeyDown(Keys.X))
+                        CurrentState = GameState.PlayScreen;
+                    break;
+            }
+          //  if(GameState.PlayScreen == CurrentState)
+          //      activeBlock.Falling(gameTime);
+
             previousKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();   //-----------Allt här ska väl till inputhelper?
 
@@ -124,30 +152,56 @@ namespace Tetris
                 Exit();
             //Rotating block
             if (Keyboard.GetState().IsKeyDown(Keys.Q))
-                lBlockInvert.RotatationLeft1();
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
-                lBlockInvert.RotatationLeft2();
-            if (Keyboard.GetState().IsKeyDown(Keys.E))
-                lBlockInvert.RotatationRight1();
-            if (Keyboard.GetState().IsKeyDown(Keys.R))
-                lBlockInvert.RotatationRight2();
+                activeBlock.TurnLeft(Content, activeBlock);
+            if (Keyboard.GetState().IsKeyDown(Keys.W))          
+                activeBlock.TurnLeft2(Content, activeBlock);
+             if (Keyboard.GetState().IsKeyDown(Keys.E))
+                 activeBlock.TurnRight(Content, activeBlock);
+             if (Keyboard.GetState().IsKeyDown(Keys.R))
+                 activeBlock.TurnRight2(Content, activeBlock); 
             //Move block sideways
             if (Keyboard.GetState().IsKeyDown(Keys.A) && !previousKeyboardState.IsKeyDown(Keys.A))
-                lBlockInvert.MoveLeft();
+                activeBlock.MoveLeft();
             if (Keyboard.GetState().IsKeyDown(Keys.D) && !previousKeyboardState.IsKeyDown(Keys.D))
-                lBlockInvert.MoveRight();
+                activeBlock.MoveRight();
+            //Move block down
+            if (Keyboard.GetState().IsKeyDown(Keys.S) && !previousKeyboardState.IsKeyDown(Keys.S))
+                activeBlock.MoveDown();
 
-            inputHelper.Update(gameTime);           
+           // lBlockInvert.Falling(gameTime);
+
+            inputHelper.Update(gameTime);               
         }
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
-            gameWorld.Draw(gameTime, spriteBatch);
-            tetrisGrid.Draw(gameTime, spriteBatch);
-            lBlockInvert.Draw(gameTime, spriteBatch);
-            //block.BlockPicker().Draw(gameTime, spriteBatch);
-            spriteBatch.End();
+            switch (CurrentState)
+            {
+                case GameState.WelcomeScreen:
+                    GraphicsDevice.Clear(Color.White);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
+                    gameWorld.Draw(gameTime, spriteBatch);
+                    //tetrisGrid.Draw(gameTime, spriteBatch);
+                    spriteBatch.End();
+                    break;
+
+                case GameState.StartScreen:
+                    GraphicsDevice.Clear(Color.White);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
+                    gameWorld.Draw(gameTime, spriteBatch);
+                    tetrisGrid.Draw(gameTime, spriteBatch);
+                    spriteBatch.End();
+                    break;
+
+                case GameState.PlayScreen:
+                    GraphicsDevice.Clear(Color.White);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
+                    gameWorld.Draw(gameTime, spriteBatch);
+                    tetrisGrid.Draw(gameTime, spriteBatch);
+                    activeBlock.Draw(gameTime, spriteBatch);
+                    //lBlockInvert.Draw(gameTime, spriteBatch);
+                    spriteBatch.End();
+                    break;
+            }
         }
         protected void MoveRowsDown()
         {
@@ -172,6 +226,5 @@ namespace Tetris
             }
             set { screen = value; }        
         }
-
     }
 }
