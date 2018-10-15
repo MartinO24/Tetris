@@ -18,7 +18,7 @@ namespace Tetris.Classes
         TetrisGrid tetrisGrid;
 
         Color color;
-        protected Point position;
+        public Point position;
         protected Texture2D emptyCell;
         protected bool[,] shape;
         Random rnd;
@@ -30,6 +30,7 @@ namespace Tetris.Classes
         Block activeblock;
         CurrentBlock currentblock;
         IBlock iblock;
+        public List<Block> gameBlocks;
 
         public Block (ContentManager Content, Color color)
         {
@@ -38,10 +39,10 @@ namespace Tetris.Classes
             emptyCell = Content.Load<Texture2D>("block");
             tetrisGrid = new TetrisGrid(Content);
             rnd = new Random();
-        }      
-        public Block SpawnNewBlock(ContentManager Content)
+        }
+        public Block SpawnNewBlock(ContentManager Content, Block block)
         {
-            LBlockInvert block = new LBlockInvert(Content);
+            block = new LBlockInvert(Content);
             return block;
             /*
             int rndBlock = rnd.Next(0,2);
@@ -61,24 +62,30 @@ namespace Tetris.Classes
                 return block;
             }   */         
         }
-        public void TurnLeft(ContentManager Content, Block block)
+        public void TetrisGameBlocks (ContentManager Content)
         {
+            gameBlocks = new List<Block>();
             lBlockInvert = new LBlockInvert(Content);
-            shape = lBlockInvert.RotatationLeft1();
+            gameBlocks.Add(lBlockInvert);
         }
-        public void TurnLeft2(ContentManager Content, Block block)
+        public void TurnLeft(Block block)
         {
             //lBlockInvert = new LBlockInvert(Content);
+            shape = lBlockInvert.RotatationLeft1();
+        }
+        public void TurnLeft2(Block block)
+        {
+            //lBlockInvert = new LBlockInvert(Content);          
             shape = lBlockInvert.RotatationLeft2();
         }
-        public void TurnRight(ContentManager Content, Block block)
+        public void TurnRight(Block block)
         {
-            lBlockInvert = new LBlockInvert(Content);
+            //lBlockInvert = new LBlockInvert(Content);
             shape = lBlockInvert.RotatationRight1();
         }
-        public void TurnRight2(ContentManager Content, Block block)
+        public void TurnRight2(Block block)
         {
-            lBlockInvert = new LBlockInvert(Content);
+            //lBlockInvert = new LBlockInvert(Content);
             shape = lBlockInvert.RotatationRight2();
         }
         public void MoveLeft()
@@ -93,7 +100,7 @@ namespace Tetris.Classes
             if (tetrisGrid.InsideGrid(position))
                 position.X++;
             else
-                position.X = 1;
+                position.X--;
         }
         public void MoveDown()
         {
