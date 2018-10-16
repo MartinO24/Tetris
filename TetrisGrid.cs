@@ -36,7 +36,7 @@ namespace Tetris.Classes
             grid = new bool[Width, Height];
             //Clear();
         }
-        public void GridBlock () //Should take in a shape from block
+        public void GridBlock () //Should take in a shape from block -- How do I make it so I can use block here?
         {
             shape = new bool[,]
             {
@@ -49,8 +49,8 @@ namespace Tetris.Classes
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    grid[y + 3, x] = shape[x, y];
-                }
+                    grid[y + 3, x] = shape[x, y]; //Can I get it to print "false" "outside" grid? To manage collision
+                }                               //grid [y + block.position.Y, x + block.position.X]
             }
         }
         public void Update(GameTime gameTime)
@@ -88,10 +88,15 @@ namespace Tetris.Classes
         }
         public bool ShapeInsideGrid (bool[,]shape)
         {
-            if (shape == grid)
-                return true;
-            else
-                return false;
+            for (int x = 0; x < 4; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    if (grid[y, x] = shape[x, y])
+                        return true; //Can I get it to print "false" "outside" grid? To manage collision
+                }                               //grid [y + block.position.Y, x + block.position.X]
+            }
+            return false;
         }
     }
 }
