@@ -33,11 +33,10 @@ namespace Tetris
 
         GameWorld gameWorld;
         TetrisGrid tetrisGrid;
-       // Block block;
+        Block block;
         public Block activeBlock;
 
         public bool gameRun { get; set; }
-        public bool keyP;
 
         Random rnd;
         protected GraphicsDeviceManager graphics;
@@ -120,9 +119,10 @@ namespace Tetris
             spriteBatch = new SpriteBatch(GraphicsDevice);
             tetrisGrid = new TetrisGrid(Content);
             gameWorld = new GameWorld(Content);
-           // block = new Block(Content, Color.White);
+            block = new Block(Content, Color.White);
             rnd = new Random();
-            activeBlock = new Block(Content, Color.White);
+            //activeBlock = new Block(Content, Color.White);
+            //shape = new bool[,];
         }
         protected override void Update(GameTime gameTime) //----------Find a way to get it back to default
         {
@@ -131,7 +131,8 @@ namespace Tetris
                 case GameState.WelcomeScreen:
                     if (Keyboard.GetState().IsKeyDown(Keys.Space))
                         CurrentState = GameState.StartScreen;
-                    activeBlock = activeBlock.SpawnNewBlock(Content);
+                    block = block.SpawnNewBlock(Content, block); //Move to block?
+                    block.TetrisGameBlocks(Content);             //Move to block?
                     break;
             }
             switch (CurrentState)
@@ -139,6 +140,7 @@ namespace Tetris
                 case GameState.StartScreen:
                     if (Keyboard.GetState().IsKeyDown(Keys.X))
                         CurrentState = GameState.PlayScreen;
+                    //activeBlock.TetrisGameBlocks(Content);
                     break;
             }
           //  if(GameState.PlayScreen == CurrentState)
@@ -150,27 +152,12 @@ namespace Tetris
             //Exit game
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            //Rotating block
-            if (Keyboard.GetState().IsKeyDown(Keys.Q))
-                activeBlock.TurnLeft(Content, activeBlock);
-            if (Keyboard.GetState().IsKeyDown(Keys.W))          
-                activeBlock.TurnLeft2(Content, activeBlock);
-             if (Keyboard.GetState().IsKeyDown(Keys.E))
-                 activeBlock.TurnRight(Content, activeBlock);
-             if (Keyboard.GetState().IsKeyDown(Keys.R))
-                 activeBlock.TurnRight2(Content, activeBlock); 
-            //Move block sideways
-            if (Keyboard.GetState().IsKeyDown(Keys.A) && !previousKeyboardState.IsKeyDown(Keys.A))
-                activeBlock.MoveLeft();
-            if (Keyboard.GetState().IsKeyDown(Keys.D) && !previousKeyboardState.IsKeyDown(Keys.D))
-                activeBlock.MoveRight();
-            //Move block down
-            if (Keyboard.GetState().IsKeyDown(Keys.S) && !previousKeyboardState.IsKeyDown(Keys.S))
-                activeBlock.MoveDown();
-
            // lBlockInvert.Falling(gameTime);
 
-            inputHelper.Update(gameTime);               
+            inputHelper.Update(gameTime);
+            tetrisGrid.Update(gameTime);
+            block.Update(gameTime);
+            
         }
         protected override void Draw(GameTime gameTime)
         {
@@ -197,8 +184,7 @@ namespace Tetris
                     spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
                     gameWorld.Draw(gameTime, spriteBatch);
                     tetrisGrid.Draw(gameTime, spriteBatch);
-                    activeBlock.Draw(gameTime, spriteBatch);
-                    //lBlockInvert.Draw(gameTime, spriteBatch);
+                    block.Draw(gameTime, spriteBatch);
                     spriteBatch.End();
                     break;
             }
