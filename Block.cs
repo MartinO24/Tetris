@@ -15,8 +15,9 @@ namespace Tetris.Classes
     {
         float elapsedGameTime = 0.0f;
 
-        TetrisGrid tetrisGrid;
+        KeyboardState currentKeyboardState, previousKeyboardState;
 
+        TetrisGrid tetrisGrid;
         Color color;
         public Point position;
         protected Texture2D emptyCell;
@@ -27,10 +28,12 @@ namespace Tetris.Classes
         SquBlock squBlock;
         LBlockInvert lBlockInvert;
         LBlock lBlock;
-        Block activeblock;
-        CurrentBlock currentblock;
+        ZBlockInvert zBlockInvert;
+        int activeBlock;
         IBlock iblock;
         public List<Block> gameBlocks;
+        public List<bool[,]> shapeList;
+        public int currentRotation = 0;
 
         public Block (ContentManager Content, Color color)
         {
@@ -40,50 +43,62 @@ namespace Tetris.Classes
             tetrisGrid = new TetrisGrid(Content);
             rnd = new Random();
         }
-        public Block SpawnNewBlock(ContentManager Content, Block block)
-        {
-            block = new LBlockInvert(Content);
-            return block;
-            /*
-            int rndBlock = rnd.Next(0,2);
-            if (rndBlock == 0)
-            {
-                block = new ZBlock(Content);
-                return block;
-            }
-            else if (rndBlock == 1)
-            {
-                block = new SquBlock(Content);
-                return block;
-            }
-            else
-            {
-                block = new TBlock(Content);
-                return block;
-            }   */         
-        }
-        public void TetrisGameBlocks (ContentManager Content)
+        public List<Block> TetrisGameBlocks (ContentManager Content)
         {
             gameBlocks = new List<Block>();
+            lBlock = new LBlock(Content);
+            tBlock = new TBlock(Content);
+            zBlock = new ZBlock(Content);
+            squBlock = new SquBlock(Content);
+            iblock = new IBlock(Content);
             lBlockInvert = new LBlockInvert(Content);
+            zBlockInvert = new ZBlockInvert(Content);
+            //gameBlocks.Add(lBlock);
+            //gameBlocks.Add(tBlock);
+            //gameBlocks.Add(zBlock);
+            //gameBlocks.Add(squBlock);
+            gameBlocks.Add(iblock);
             gameBlocks.Add(lBlockInvert);
+            //gameBlocks.Add(zBlockInvert);
+            activeBlock = RandomBlock();
+            return gameBlocks;
         }
-        public void TurnLeft(Block block)
+        public Block SpawnNewBlock(ContentManager Content, Block block)
         {
-            //lBlockInvert = new LBlockInvert(Content);
-            shape = lBlockInvert.RotatationLeft1();
+            gameBlocks = TetrisGameBlocks(Content);
+            block = gameBlocks[activeBlock];
+            return block;
         }
-        public void TurnLeft2(Block block)
+        public int RandomBlock()
         {
-            //lBlockInvert = new LBlockInvert(Content);          
-            shape = lBlockInvert.RotatationLeft2();
+            int rndBlock = 1; 
+            // int rndBlock = rnd.Next(2);
+            return rndBlock;
         }
-        public void TurnRight(Block block)
+        public void TurnLeft() //Should depend on what block we got from SpawnedNewBlock
         {
-            //lBlockInvert = new LBlockInvert(Content);
-            shape = lBlockInvert.RotatationRight1();
+            bool moveAllowed = true;
+            if (activeBlock == 1)
+            {
+                shapeList = lBlockInvert.Rotations();                 
+                shape = shapeList[currentRotation];
+                currentRotation++;
+                if (currentRotation > 3)
+                    currentRotation = 0;
+            }
         }
-        public void TurnRight2(Block block)
+        public void TurnRight()
+        {
+            if (activeBlock == 1)
+            {
+                shapeList = lBlockInvert.Rotations();
+                shape = shapeList[currentRotation];
+                currentRotation--;
+                if (currentRotation < 0)
+                    currentRotation = 3;
+            }
+        }
+        public void TurnRight2()
         {
             //lBlockInvert = new LBlockInvert(Content);
             shape = lBlockInvert.RotatationRight2();
@@ -117,6 +132,25 @@ namespace Tetris.Classes
                 position.Y++;
                 elapsedGameTime = 0;
             }
+        }
+
+        public void Update (GameTime gameTime)
+        {
+            previousKeyboardState = currentKeyboardState;
+            currentKeyboardState = Keyboard.GetState();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Q) && !previousKeyboardState.IsKeyDown(Keys.Q))
+                TurnLeft();
+            if (Keyboard.GetState().IsKeyDown(Keys.W) && !previousKeyboardState.IsKeyDown(Keys.W))
+                TurnRight();
+            //Move block sideways
+            if (Keyboard.GetState().IsKeyDown(Keys.A) && !previousKeyboardState.IsKeyDown(Keys.A))
+                MoveLeft();
+            if (Keyboard.GetState().IsKeyDown(Keys.D) && !previousKeyboardState.IsKeyDown(Keys.D))
+                MoveRight();
+            //Move block down
+            if (Keyboard.GetState().IsKeyDown(Keys.S) && !previousKeyboardState.IsKeyDown(Keys.S))
+                MoveDown();
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
