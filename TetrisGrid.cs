@@ -36,7 +36,7 @@ namespace Tetris.Classes
             grid = new bool[Width, Height];
             //Clear();
         }
-        public void GridBlock () //Should take in a shape from block -- How do I make it so I can use block here?
+        public void PlaceBlock () //Should take in a shape from block -- How do I make it so I can use block here?
         {
             shape = new bool[,]
             {
@@ -44,18 +44,19 @@ namespace Tetris.Classes
                 {false, false, true, false},
                 {false, true, true, false},
                 {false, false, false, false},
-            };
+            }; 
             for (int x = 0; x < 4; x++)
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    grid[y + 3, x] = shape[x, y]; //Can I get it to print "false" "outside" grid? To manage collision
+                    if(shape[x,y])
+                    grid[y + 7, x] = shape[x, y]; //Can I get it to print "false" "outside" grid? To manage collision
                 }                               //grid [y + block.position.Y, x + block.position.X]
             }
         }
         public void Update(GameTime gameTime)
         {
-            GridBlock();
+            PlaceBlock();
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
@@ -86,17 +87,26 @@ namespace Tetris.Classes
         {
             return position.X >= 0 && position.X < Width && position.Y < Height && position.Y >= 0;
         }
-        public bool ShapeInsideGrid (bool[,]shape)
+        public bool ShapeInsideGrid (bool[,]shape, Point position)
         {
             for (int x = 0; x < 4; x++)
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    if (grid[y, x] = shape[x, y])
-                        return true; //Can I get it to print "false" "outside" grid? To manage collision
+                    if (shape[x, y])
+                    {
+                        //return grid[position.X + x, position.Y + y] == shape[x, y];
+                        //is inside the grid
+                        int globalX = position.X + x;
+                        //int globalY = position.Y + y;
+                        if (globalX < 0 || globalX >= Width)
+                            return false;
+                        //collide with other blocks
+                    }
+                    //Can I get it to print "false" "outside" grid? To manage collision
                 }                               //grid [y + block.position.Y, x + block.position.X]
             }
-            return false;
+            return true;
         }
     }
 }
