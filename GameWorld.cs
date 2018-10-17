@@ -13,11 +13,13 @@ namespace Tetris.Classes
 { 
     class GameWorld
     {
-    enum GameState
-    {
-        Playing,
-        GameOver
-    }
+        enum GameState
+        {
+            WelcomeScreen,
+            StartScreen,
+            PlayScreen,
+            GameOverScreen
+        }
     public static Random Random { get { return Random; } }
     static Random random;
     GameState gameState;
@@ -26,7 +28,7 @@ namespace Tetris.Classes
     public GameWorld(ContentManager Content)
     {
         random = new Random();
-        gameState = GameState.Playing;
+        gameState = GameState.PlayScreen;
         font = Content.Load<SpriteFont>("SpelFont");
         grid = new TetrisGrid(Content);
     }
@@ -39,11 +41,11 @@ namespace Tetris.Classes
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 scorePosition = new Vector2(330, 0);
+            Vector2 position = new Vector2(330, 0);
             Vector2 levelPosition = new Vector2(330, 30);
             Vector2 nextBlockPosition = new Vector2(330, 60);
 
-            spriteBatch.DrawString(font, "Score: ", scorePosition, Color.Blue);
+            spriteBatch.DrawString(font, "Score: ", position, Color.Blue);
             spriteBatch.DrawString(font, "Level: ", levelPosition, Color.Blue);
             spriteBatch.DrawString(font, "Next block: ", nextBlockPosition, Color.Blue);
         }
