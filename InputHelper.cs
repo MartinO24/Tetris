@@ -15,7 +15,7 @@ namespace Tetris.Classes
             offset = Vector2.Zero;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             previousKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();
