@@ -21,19 +21,12 @@ namespace Tetris.Classes
         Color color;
         public Point position;
         protected Texture2D emptyCell;
-        protected bool[,] shape;
+        protected Color[,] shape;
         Random rnd;
-        ZBlock zBlock;
-        TBlock tBlock;
-        SquBlock squBlock;
-        LBlockInvert lBlockInvert;
-        LBlock lBlock;
-        ZBlockInvert zBlockInvert;
-        int activeBlock;
-        IBlock iblock;
-        public List<Block> gameBlocks;
-        public List<bool[,]> shapeList;
+
+        public List<List<Color[,]>> gameBlocks;
         public int currentRotation = 0;
+        private int currentBlock;
 
         public Block (ContentManager Content, Color color)
         {
@@ -42,66 +35,161 @@ namespace Tetris.Classes
             emptyCell = Content.Load<Texture2D>("block");
             tetrisGrid = new TetrisGrid(Content);
             rnd = new Random();
+            currentBlock = RandomBlock();
+            //TetrisGameBlocks(Content);
         }
-        public List<Block> TetrisGameBlocks (ContentManager Content)
+        public Color[,] Transpose(Color[,] shape) //https://stackoverflow.com/questions/29483660/how-to-transpose-matrix
         {
-            gameBlocks = new List<Block>();
-            lBlock = new LBlock(Content);
-            tBlock = new TBlock(Content);
-            zBlock = new ZBlock(Content);
-            squBlock = new SquBlock(Content);
-            iblock = new IBlock(Content);
-            lBlockInvert = new LBlockInvert(Content);
-            zBlockInvert = new ZBlockInvert(Content);
-            //gameBlocks.Add(lBlock);
-            //gameBlocks.Add(tBlock);
-            //gameBlocks.Add(zBlock);
-            //gameBlocks.Add(squBlock);
-            gameBlocks.Add(iblock);
-            gameBlocks.Add(lBlockInvert);
-            //gameBlocks.Add(zBlockInvert);
-            activeBlock = RandomBlock();
+            int width = shape.GetLength(0);
+            int height = shape.GetLength(1);
+
+            Color[,] result = new Color[height, width];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    result[y, x] = shape[x, y];
+                }
+            }
+            return result;
+        }
+        public List<List<Color[,]>>  TetrisGameBlocks (Color[,] shape)
+        {
+            Color white = Color.White;
+            Color magenta = Color.Magenta;
+            Color blue = Color.Blue;
+            gameBlocks = new List<List<Color[,]>>();
+            List<Color[,]> lBlockShapes = new List<Color[,]>();
+
+            List<Color[,]> lBlockInvertShapes = new List<Color[,]>();
+            Color[,] lBlockInvertshape1 = new Color[,]
+            {
+                {white, white, magenta, white},
+                {white, white, magenta, white},
+                {white, magenta, magenta, white},
+                {white, white, white, white},
+            };
+            Color[,] lBlockInvertshape2 = new Color[,]
+            {
+                {magenta, white, white, white},
+                {magenta, magenta, magenta, white},
+                {white, white, white, white},
+                {white, white, white, white},
+            };
+            Color[,] lBlockInvertshape3 = new Color[,]
+            {
+                {white, magenta, magenta, white},
+                {white, magenta, white, white},
+                {white, magenta, white, white},
+                {white, white, white, white},
+            };
+            Color[,] lBlockInvertshape4 = new Color[,]
+            {
+                {white, magenta, magenta, magenta},
+                {white, white, white, magenta},
+                {white, white, white, white},
+                {white, white, white, white},
+            };
+          /*  lBlockInvertshape1 = Transpose(lBlockInvertshape1);
+            lBlockInvertshape2 = Transpose(lBlockInvertshape2);
+            lBlockInvertshape3 = Transpose(lBlockInvertshape3);
+            lBlockInvertshape4 = Transpose(lBlockInvertshape4); */
+            lBlockInvertShapes.Add(lBlockInvertshape1);
+            lBlockInvertShapes.Add(lBlockInvertshape2);
+            lBlockInvertShapes.Add(lBlockInvertshape3);
+            lBlockInvertShapes.Add(lBlockInvertshape4);
+            List<Color[,]> zBlockShapes = new List<Color[,]>();
+            List<Color[,]> ZBlockInvertShapes = new List<Color[,]>();
+            List<Color[,]> squBlock = new List<Color[,]>();
+
+            List<Color[,]> iBlockShapes = new List<Color[,]>();
+            Color[,] iBlockshape1 = new Color[,]
+            {
+                {white, blue, white, white},
+                {white, blue, white, white},
+                {white, blue, white, white},
+                {white, blue, white, white},
+            };
+            Color[,] iBlockshape2 = new Color[,]
+            {
+                {white, white, white, white},
+                {blue, blue, blue, blue},
+                {white, white, white, white},
+                {white, white, white, white},
+            };
+            Color[,] iBlockshape3 = new Color[,]
+            {
+                {white, blue, white, white},
+                {white, blue, white, white},
+                {white, blue, white, white},
+                {white, blue, white, white},
+            };
+            Color[,] iBlockshape4 = new Color[,]
+            {
+                {white, white, white, white},
+                {blue, blue, blue, blue},
+                {white, white, white, white},
+                {white, white, white, white},
+            };
+          //  iBlockshape1 = Transpose(iBlockshape1); //For some reason the blocks were inverted so we used transpose method to correct this by swapping the X and Y values.
+          //  iBlockshape2 = Transpose(iBlockshape2);
+          //  iBlockshape2 = Transpose(iBlockshape3);
+          //  iBlockshape2 = Transpose(iBlockshape4);
+            iBlockShapes.Add(iBlockshape1);
+            iBlockShapes.Add(iBlockshape2);
+            iBlockShapes.Add(iBlockshape3);
+            iBlockShapes.Add(iBlockshape4);
+            List<Color[,]> tBlockShapes = new List<Color[,]>();
+            
+            gameBlocks.Add(lBlockInvertShapes);
+            gameBlocks.Add(iBlockShapes);
             return gameBlocks;
+
+            /* tBlock = new TBlock(Content);
+             zBlock = new ZBlock(Content);
+             squBlock = new SquBlock(Content);
+             iblock = new IBlock(Content);
+             lBlockInvert = new LBlockInvert(Content);
+             zBlockInvert = new ZBlockInvert(Content); 
+             //gameBlocks.Add(lBlock);
+             //gameBlocks.Add(tBlock);
+             //gameBlocks.Add(zBlock);
+             //gameBlocks.Add(squBlock);
+             gameBlocks.Add(iblock);
+             gameBlocks.Add(lBlockInvert);
+             //gameBlocks.Add(zBlockInvert);
+             activeBlock = RandomBlock(); */
         }
-        public Block SpawnNewBlock(ContentManager Content, Block block)
+        public Color[,] SpawnNewBlock(Color[,] shape)
         {
-            gameBlocks = TetrisGameBlocks(Content);
-            block = gameBlocks[activeBlock];
-            return block;
+            gameBlocks = TetrisGameBlocks(shape);
+            shape = gameBlocks[currentBlock][0];
+            return shape;
         }
         public int RandomBlock()
         {
-            int rndBlock = 1; 
-            // int rndBlock = rnd.Next(2);
+            int rndBlock = 0; 
+            //rndBlock = rnd.Next(2);
             return rndBlock;
         }
-        public void TurnLeft() //Should depend on what block we got from SpawnedNewBlock
+        public void Rotate(int direction) 
         {
-            bool moveAllowed = true;
-            if (activeBlock == 1)
-            {
-                shapeList = lBlockInvert.Rotations();                 
-                shape = shapeList[currentRotation];
-                currentRotation++;
-                if (currentRotation > 3)
-                    currentRotation = 0;
-            }
-        }
-        public void TurnRight()
-        {
-            if (activeBlock == 1)
-            {
-                shapeList = lBlockInvert.Rotations();
-                shape = shapeList[currentRotation];
-                currentRotation--;
-                if (currentRotation < 0)
-                    currentRotation = 3;
-            }
-        }
-        public void TurnRight2()
-        {
-            //lBlockInvert = new LBlockInvert(Content);
-            shape = lBlockInvert.RotatationRight2();
+            currentRotation += direction;
+            currentRotation = currentRotation % 4;
+            if (currentRotation < 0)
+                currentRotation = 3;
+            shape = gameBlocks[currentBlock][currentRotation]; //iBlock rotationen är lite fucked
+
+            /*  if (activeBlock == 1)
+              {
+                  shapeList = lBlockInvert.Rotations();
+                  currentRotation += direction;
+                  currentRotation = currentRotation % 4;
+                  if (currentRotation < 0)
+                      currentRotation = 3;
+                  shape = shapeList[currentRotation];
+              } */
         }
         public void MoveLeft()
         {
@@ -112,7 +200,8 @@ namespace Tetris.Classes
         }
         public void MoveRight()  //Kan ett block vara på denna positionen innanför gridden
         {
-            if (tetrisGrid.InsideGrid(position))
+            Color[,] shape = gameBlocks [currentBlock][currentRotation];
+            if (tetrisGrid.InsideGrid(position)) //&& tetrisGrid.ShapeInsideGrid(shape, position))
                 position.X++;
             else
                 position.X--;
@@ -133,16 +222,16 @@ namespace Tetris.Classes
                 elapsedGameTime = 0;
             }
         }
-
         public void Update (GameTime gameTime)
         {
             previousKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();
 
+            //Rotate blocks
             if (Keyboard.GetState().IsKeyDown(Keys.Q) && !previousKeyboardState.IsKeyDown(Keys.Q))
-                TurnLeft();
+                Rotate(1);
             if (Keyboard.GetState().IsKeyDown(Keys.W) && !previousKeyboardState.IsKeyDown(Keys.W))
-                TurnRight();
+                Rotate(-1);
             //Move block sideways
             if (Keyboard.GetState().IsKeyDown(Keys.A) && !previousKeyboardState.IsKeyDown(Keys.A))
                 MoveLeft();
@@ -158,9 +247,10 @@ namespace Tetris.Classes
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    if(shape[x,y])
+                    shape = gameBlocks[currentBlock][currentRotation];
+                    if(shape[x,y] != Color.White)
                     {
-                        Vector2 drawPosition = new Vector2((position.X + y) * emptyCell.Width, (position.Y + x) * emptyCell.Height);
+                        Vector2 drawPosition = new Vector2((position.X + x) * emptyCell.Width, (position.Y + y) * emptyCell.Height);
                         spriteBatch.Draw(emptyCell, drawPosition, color);
                     }
                 }
