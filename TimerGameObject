@@ -39,11 +39,6 @@ class TimerGameObject : TextGameObject
             color = Color.Red;
         }
     }
-    public double Time
-    {
-        get { return time; }
-        set { time = value; }
-    }
 
     public override void Reset()
     {
