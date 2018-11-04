@@ -9,7 +9,6 @@ class TimerGameObject : TextGameObject
     protected TimeSpan timeLeft;
     protected bool running;
     protected double multiplier;
-    protected double time;
 
     public TimerGameObject(int layer = 0, string id = "")
         : base("Fonts/Hud", layer, id)
